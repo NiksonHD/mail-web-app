@@ -2,6 +2,8 @@ import requests,sys, re, bs4, string, ctypes, clipboard, webbrowser, pdfkit, os,
 from pyqrcode import QRCode
 from barcode import EAN13
 from configPath import *
+from barcode import Code128
+from barcode.writer import ImageWriter
 
 #from selenium import map
 #from selenium.webdriver.common.by import By
@@ -19,8 +21,6 @@ def is_admin():
     except:
         return False
 if is_admin():
-	# fileDestination = "C:\\Users\\a\\PRINT-WEB-SHOP\\*"
-	# files = glob.glob(r"C:\Users\a\PRINT-WEB-SHOP\*")
 	files = glob.glob(mailsPath + "*")
 	
 	for f in files:
@@ -65,7 +65,6 @@ if is_admin():
 			rawSaps = sapString.group(0)
 			
 			for line in rawSaps.splitlines():
-				# for word in line.split():
 				try:
 					lineArray = line.split()
 					if len(lineArray[0]) < 5:
@@ -89,12 +88,9 @@ if is_admin():
 							sapArray.append(quantity)
 					except IndexError:
 						continue
-			#for win machine
 			
 		file = open(htmlPath, "w", encoding='utf-8')
 
-		#for dev
-		# file = open(r"C:\Users\nikso\python-scripts\web-order.html", "w", encoding='utf-8')
 
 		file.write('''<head>
 		<meta charset="UTF-8">
@@ -113,16 +109,12 @@ if is_admin():
 		sapString = " ".join(sapArray)
 		print(sapString)
 		print(webNumber)
-		#sys.exit()
 		qrCode = pyqrcode.create(webNumber + " " + sapString)
-		qrCode.png(r"C:\Users\a\Music\NHD\python-scripts\web-QR-code.png", scale = 6)
-		#input('Natisni enter za krai.')
+		qrCode.png(qrPath, scale = 6)
 		divIter = 1
 
-		#for dev
-		# file = open(r"C:\Users\nikso\python-scripts\web-order.html", "a", encoding='utf-8')
+	
 
-		#for win machine
 		file = open(htmlPath, "a", encoding='utf-8')
 
 		for sapNum in sapArray:
@@ -133,12 +125,12 @@ if is_admin():
 					articleName = str(soup.select('.breadcrumbs')[0]).split('<span>')[1]
 					try:
 						ean = soup.select('.product-code')[1]
-
-						#my_code = EAN13(ean)
-						#my_code.save(r"C:\Users\a\Music\NHD\python-scripts\456")
+						
 					except IndexError:
 						ean = '<p class="product-code">EAN: Няма в сайт.</p>'
-					try:	
+					try:
+						barcode = Code128(sapNum, writer=ImageWriter())
+						barcode.save(barcodePath + sapNum)	
 						pic = soup.select('.preview-media')[0]
 						pic = str(pic)
 						sourcePicTemp = pic.split('src="')[1]
@@ -176,7 +168,8 @@ if is_admin():
 
 					file.write('''<li style="font-size:23px"><div id="Div'''+str(divIter)+ ''' "><a href="https://praktiker.bg/p/
 					'''+str(sapNum)+'''#globalMessages">'''+str(sapNum)+'''</a> '''+str(articleName)
-					+''' ''' + str(ean) + price+'''</table><img src="'''+imgUrl+'''" width="170" height="140" style="position:absolute; margin:-70px 560px -70px 810px"> ''')
+					+''' ''' + str(ean) + price+'''</table><img src="'''+imgUrl+'''" width="170" height="140" style="position:absolute; margin:-70px 560px -70px 810px"> 
+					<img src="'''+ barcodePath + sapNum + '''.png" width="170" height="10" style="position:absolute; margin:-10px 460px -10px 310px" >''')
 					#+''' ''' + str(ean) + price+'''</table><img src="'''+imgUrl+'''" width="90" height="90"> ''')
 				elif len(sapNum.strip()) < 4 and sapNum != '' and sapNum.isnumeric() :
 				#<div>
@@ -201,7 +194,6 @@ if is_admin():
 		</script>
 
 		<div><img src="web-QR-code.png" width="170" height="170"> </div> ''')
-		#file.write(''' <div><img src="web-QR-code.png" width="170" height="170"> </div> ''')
 		file.close()
 		options = {
 	  "enable-local-file-access": None
@@ -211,26 +203,25 @@ if is_admin():
 		
 		config = pdfkit.configuration(wkhtmltopdf="C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe")
 		pdfkit.from_file(htmlPath, pdfFolder + webNumber + ".pdf", configuration=config, options = options )
-		os.startfile(pdfFolder + webNumber + ".pdf", "print")
+		# os.startfile(pdfFolder + webNumber + ".pdf", "print")
+		os.startfile(pdfFolder + webNumber + ".pdf")
 
 		# open result in browser
 		#webbrowser.open('file:///C:/Users/a/Music/NHD/python-scripts/web-order.html')
 
 		# webbrowser.open('file:///C:/Users/nikso/python-scripts/web-order.html')
-					
-		# time.sleep(2)
-
-
 		
 	print(sapArray)
 	print(webNumber)			
 	print(webOrder)
 	text.close()
-
-files = glob.glob(r"C:\Users\a\PRINT-WEB-SHOP\*")
+files = glob.glob(mailsPath + "*")
 for f in files:
 	os.remove(f)
-	
-else:
+barcodes = glob.glob(barcodePath + "*")
+print(len(barcodes))
+for b in barcodes:
+	os.remove(b)	
+# else:
 # Re-run the program with admin rights
-    ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
+    # ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
