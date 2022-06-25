@@ -21,6 +21,10 @@ def is_admin():
     except:
         return False
 if is_admin():
+	pdfFiles = glob.glob(pdfFolder + "*")
+	if (len(pdfFiles)) > 1300:
+		for pdf in pdfFiles:
+			os.remove(pdf)
 	files = glob.glob(mailsPath + "*")
 	
 	for f in files:
@@ -169,7 +173,7 @@ if is_admin():
 					file.write('''<li style="font-size:23px"><div id="Div'''+str(divIter)+ ''' "><a href="https://praktiker.bg/p/
 					'''+str(sapNum)+'''#globalMessages">'''+str(sapNum)+'''</a> '''+str(articleName)
 					+''' ''' + str(ean) + price+'''</table><img src="'''+imgUrl+'''" width="170" height="140" style="position:absolute; margin:-70px 560px -70px 810px"> 
-					<img src="'''+ barcodePath + sapNum + '''.png" width="170" height="10" style="position:absolute; margin:-10px 460px -10px 310px" >''')
+					<img src="'''+ barcodePath + sapNum + '''.png" width="170" height="15" style="position:absolute; margin:-10px 460px -10px 310px" >''')
 					#+''' ''' + str(ean) + price+'''</table><img src="'''+imgUrl+'''" width="90" height="90"> ''')
 				elif len(sapNum.strip()) < 4 and sapNum != '' and sapNum.isnumeric() :
 				#<div>
@@ -203,8 +207,8 @@ if is_admin():
 		
 		config = pdfkit.configuration(wkhtmltopdf="C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe")
 		pdfkit.from_file(htmlPath, pdfFolder + webNumber + ".pdf", configuration=config, options = options )
-		# os.startfile(pdfFolder + webNumber + ".pdf", "print")
-		os.startfile(pdfFolder + webNumber + ".pdf")
+		os.startfile(pdfFolder + webNumber + ".pdf", "print")
+		# os.startfile(pdfFolder + webNumber + ".pdf")
 
 		# open result in browser
 		#webbrowser.open('file:///C:/Users/a/Music/NHD/python-scripts/web-order.html')
