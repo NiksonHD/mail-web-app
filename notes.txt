@@ -1,0 +1,24 @@
+md "C:\Users\a\PRINT-WEB-SHOP\"
+
+md "C:\Users\a\Music\NHD\python-scripts\"
+
+md "C:\Users\a\Music\NHD\python-scripts\pdf-files"
+
+md "C:\Users\a\Music\NHD\python-scripts\barcodes"
+
+
+To Drujbai
+set shortcut
+cmd /c "path to your batch file"
+
+https://wkhtmltopdf.org/downloads.html
+
+pip install pipreqs
+pipreqs .
+pip install -r requirements.txt
+pip install python-barcode
+
+pip install Pillow
+
+
+pip3 install urllib3==1.23
