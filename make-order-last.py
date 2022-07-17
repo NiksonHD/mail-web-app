@@ -25,7 +25,15 @@ if is_admin():
 	if (len(pdfFiles)) > 1300:
 		for pdf in pdfFiles:
 			os.remove(pdf)
-	files = glob.glob(mailsPath + "*")
+			
+	files = glob.glob(mailsPath + "*.eml")
+	pdfs = glob.glob(mailsPath + "*.pdf")
+	for pd in pdfs:
+		os.startfile(pd, "print")
+	if (len(files)) == 0:
+		time.sleep(10)
+		for pd in pdfs:
+			os.remove(pd)
 	
 	for f in files:
 		
@@ -124,7 +132,7 @@ if is_admin():
 		for sapNum in sapArray:
 				if len(sapNum) == 6:
 
-					res =requests.get('https://praktiker.bg/p/' + sapNum)
+					res =requests.get('http://praktiker.bg/p/' + sapNum)
 					soup = bs4.BeautifulSoup(res.text, 'html.parser')
 					articleName = str(soup.select('.breadcrumbs')[0]).split('<span>')[1]
 					try:
@@ -215,9 +223,6 @@ if is_admin():
 
 		# webbrowser.open('file:///C:/Users/nikso/python-scripts/web-order.html')
 		
-	print(sapArray)
-	print(webNumber)			
-	print(webOrder)
 	text.close()
 files = glob.glob(mailsPath + "*")
 for f in files:
