@@ -5,6 +5,8 @@ from configPath import *
 from barcode import Code128
 from barcode.writer import ImageWriter
 from tkinter import messagebox
+from PyPDF2 import PdfFileMerger
+
 
 #from selenium import map
 #from selenium.webdriver.common.by import By
@@ -35,19 +37,24 @@ if is_admin():
 		root.withdraw()
 
 		# Message Box
-		messagebox.showinfo("Грешка!", "Няма запазени документи в папка 'PRINT-WEB-SHOP'")
+		# messagebox.showinfo("Грешка!", "Няма запазени документи в папка 'PRINT-WEB-SHOP'")
 		sys.exit()
+	merger = PdfFileMerger()
 	files = glob.glob(mailsPath + "*.eml")
-	pdfs = glob.glob(inputPdf + "*.pdf")
-	sortedPdfs = sorted(pdfs, key=lambda t: os.stat(t).st_mtime_ns)
+	pdfs = glob.glob(mailsPath + "*.pdf")
+	if (len(pdfs)) > 0:
+		sortedPdfs = sorted(pdfs, key=lambda t: os.stat(t).st_mtime_ns)
 
-
-	for pdf in sortedPdfs:
-		os.startfile(pdf, "print")
+		for pdf in sortedPdfs:
+			merger.append(open(pdf, 'rb'))
+		with open(inputPdf + "merged-pdfs.pdf", "wb") as fout:
+			merger.write(fout)	
+	
+		os.startfile(inputPdf + "merged-pdfs.pdf")
 	if (len(files)) == 0:
 		for file in glob.glob(mailsPath + "*"):
 			os.remove(file)
-		sys.exit()	
+		sys.exit()
 	for f in files:
 		
 		
